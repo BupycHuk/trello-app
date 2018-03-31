@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { BoardService } from '../services/board.service';
 import { Board } from '../models/board';
 import { Router } from '@angular/router';
+declare var jQuery:any;
+declare var $ :any;
 
 @Component({
   selector: 'app-dashboard',
