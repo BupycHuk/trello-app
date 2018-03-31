@@ -1,0 +1,24 @@
+.column {
+  display: inline-block;
+  height: 100%;
+  width: 200px;
+  background: #dbdbdb;
+  padding: 15px;
+  vertical-align: top;
+  margin-right: 10px;
+  border-radius: 6px;
+}
+
+.task {
+  padding: 5px 2px;
+  margin: 5px 0;
+  background: #f9f9f9;
+}
+
+.task .close {
+  font-size: 1rem;
+}
+
+.board {
+  white-space: nowrap;
+}

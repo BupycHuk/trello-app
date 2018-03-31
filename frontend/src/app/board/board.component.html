@@ -1,0 +1,30 @@
+<div class="board">
+  <div class="column" *ngFor="let column of columns">
+    <div dnd-droppable (onDropSuccess)="transferTaskSuccess(column, $event)" >
+      <div class="close" (click)="removeColumn(column)"><span>x</span></div>
+      <h5 [hidden]="column.is_updating"  (click)="column.is_updating = true">{{ column.title}}</h5>
+      <input [(ngModel)]="column.title" #title [hidden]="!column.is_updating" class="form-control"
+             (keyup.enter)="updateColumn(column, title.value)" (blur)="updateColumn(column, title.value)" />
+      <div class="task" *ngFor="let task of column.tasks" dnd-draggable [dragEnabled]="true" [dragData]="{task: task, oldColumn: column}">
+        <div class="close" (click)="removeTask(task, column)"><span>x</span></div>
+        <div [hidden]="task.is_updating" (click)="task.is_updating = true">{{task.title}}</div>
+        <input [(ngModel)]="task.title" #title [hidden]="!task.is_updating" class="form-control"
+               (keyup.enter)="updateTask(task, column, title.value)" (blur)="updateTask(task, column, title.value)" />
+      </div>
+      <div class="new-task">
+        <a class="btn btn-success" href="#" (click)="newTask(column)">
+          Добавить задачу
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="column">
+    <h5>Новая колонка</h5>
+    <div class="form-group">
+      <input #columnName class="form-control" >
+    </div>
+    <a class="btn btn-success" href="#" (click)="newColumn(columnName.value); columnName.value = ''; false">
+        Добавить
+    </a>
+  </div>
+</div>

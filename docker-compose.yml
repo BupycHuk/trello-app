@@ -1,0 +1,28 @@
+version: '2'
+services:
+  postgres:
+    image: postgres:9.4
+    environment:
+      POSTGRES_USER: trello
+      POSTGRES_DB: trello
+      POSTGRES_PASSWORD: "123"
+    ports:
+      - "5431:5432"
+  web:
+    build: .
+    command: dockerize -timeout 2m -wait tcp://postgres:5432 bash -c "bundle install && rm -rf tmp/pids/server.pid && rake db:migrate RAILS_ENV=development && bundle exec rails s -p 3000 -e development -b '0.0.0.0'"
+    volumes:
+      - .:/myapp
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgres://trello:123@postgres:5432/trello"
+      RAILS_ENV: development
+  frontend:
+    image: node:8.11.0
+    command: sh -c "npm install && npm start"
+    volumes:
+      - ./frontend:/myapp
+    working_dir: /myapp
+    ports:
+      - "4200:4200"

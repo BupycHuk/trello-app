@@ -1,0 +1,37 @@
+
+<div class="jumbotron">
+  <h1 class="display-3">Добро пожаловать</h1>
+  <p class="lead">Трелло представляет из себя Канбан доску для командной работы</p>
+  <p>
+    <a class="btn btn-lg btn-success" href="#" data-toggle="modal" data-target="#myModal" role="button">Создать доску</a>
+  </p>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Modal Heading</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Board name:</label>
+          <input #boardName class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary" (click)="createBoard(boardName.value); boardName.value=''">Submit</button>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
