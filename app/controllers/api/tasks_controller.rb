@@ -1,12 +1,6 @@
 class Api::TasksController < ApiController
   before_action :set_api_task, only: [:show, :update, :destroy]
 
-  # GET /api/tasks
-  # GET /api/tasks.json
-  def index
-    @api_tasks = Task.all
-  end
-
   # GET /api/tasks/1
   # GET /api/tasks/1.json
   def show

@@ -1,3 +1,5 @@
+<h1>{{board.title}}</h1>
+
 <div class="board">
   <div class="column" *ngFor="let column of columns">
     <div dnd-droppable (onDropSuccess)="transferTaskSuccess(column, $event)" >

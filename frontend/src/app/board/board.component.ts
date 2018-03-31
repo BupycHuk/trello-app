@@ -13,7 +13,7 @@ import {Task} from "../models/task";
   styleUrls: ['./board.component.css']
 })
 export class BoardComponent implements OnInit {
-  board: Board;
+  board: Board = new Board();
   columns: Column[];
 
   constructor(
