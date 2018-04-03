@@ -6,4 +6,5 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:3000/',
+  actionCableUrl: 'ws://localhost:3000/websocket'
 };

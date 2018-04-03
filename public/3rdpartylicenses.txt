@@ -71,6 +71,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 MIT
 MIT
 
+actioncable@5.1.6
+MIT
+MIT
+
 @angular/common@5.2.9
 MIT
 MIT
@@ -80,6 +84,10 @@ MIT
 MIT
 
 @angular/router@5.2.9
+MIT
+MIT
+
+angular2-actioncable@1.1.5
 MIT
 MIT
 

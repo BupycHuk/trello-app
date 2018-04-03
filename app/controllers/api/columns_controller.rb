@@ -21,6 +21,7 @@ module Api
       @column.board = @board
 
       if @column.save
+        BoardChannel.broadcast_to(@board, {action: 'newColumn', column: @column})
         render :show, status: :created
       else
         render json: @column.errors, status: :unprocessable_entity
@@ -31,6 +32,7 @@ module Api
     # PATCH/PUT /columns/1.json
     def update
       if @column.update(column_params)
+        BoardChannel.broadcast_to(@board, {action: 'updateColumn', column: @column})
         render :show, status: :ok
       else
         render json: @column.errors, status: :unprocessable_entity
@@ -40,6 +42,7 @@ module Api
     # DELETE /columns/1
     # DELETE /columns/1.json
     def destroy
+      BoardChannel.broadcast_to(@board, {action: 'removeColumn', column: @column})
       @column.destroy
     end
 

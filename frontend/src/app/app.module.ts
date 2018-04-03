@@ -12,6 +12,7 @@ import {ColumnService} from "./services/column.service";
 import {TaskService} from "./services/task.service";
 import {FormsModule} from "@angular/forms";
 import {DndModule} from 'ng2-dnd';
+import {ActionCableService} from "angular2-actioncable";
 
 
 const appRoutes: Routes = [
@@ -39,7 +40,8 @@ const appRoutes: Routes = [
   providers: [
     BoardService,
     ColumnService,
-    TaskService
+    TaskService,
+    ActionCableService
   ],
   bootstrap: [AppComponent]
 })

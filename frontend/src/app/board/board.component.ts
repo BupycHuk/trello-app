@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {BoardService} from "../services/board.service";
 import {ActivatedRoute} from "@angular/router";
 import {ColumnService} from "../services/column.service";
@@ -6,17 +6,22 @@ import {Column} from "../models/column";
 import {Board} from "../models/board";
 import {TaskService} from "../services/task.service";
 import {Task} from "../models/task";
+import { Subscription } from 'rxjs/Subscription';
+import { ActionCableService, Channel } from 'angular2-actioncable';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-board',
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.css']
 })
-export class BoardComponent implements OnInit {
+export class BoardComponent implements OnInit, OnDestroy {
   board: Board = new Board();
+  subscription: Subscription;
   columns: Column[];
 
   constructor(
+    private cableService: ActionCableService,
     private route: ActivatedRoute,
     private boardService: BoardService,
     private taskService: TaskService,
@@ -29,7 +34,42 @@ export class BoardComponent implements OnInit {
     });
     this.columnService.getColumns(link).subscribe(columns => {
       this.columns = columns;
-    })
+    });
+    this.actionCableInit(link);
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  private actionCableInit(link: string) {
+    const channel: Channel = this.cableService
+      .cable(environment.actionCableUrl)
+      .channel('BoardChannel', {link: link});
+
+    // Subscribe to incoming messages
+    this.subscription = channel.messages.subscribe(message => {
+      switch (message.action) {
+        case 'newColumn':
+          this.columns.push(message.column);
+          break;
+        case 'removeColumn':
+          let column = this.findById(this.columns, message.column.id);
+          BoardComponent.remove(this.columns, column);
+          break;
+        case 'updateColumn':
+          column = this.findById(this.columns, message.column.id);
+          column.title = message.column.title;
+      }
+    });
+  }
+
+  private findById(columns: any[], id: any) {
+    return columns.find((value, index, obj) => {
+      if (value.id == id) {
+        return true;
+      }
+    });
   }
 
   private boardLink() {
@@ -43,9 +83,27 @@ export class BoardComponent implements OnInit {
     }
     let newColumn = new Column();
     newColumn.title = title;
-    this.columnService.addColumn(this.boardLink(), newColumn).subscribe(column => {
-      this.columns.push(column);
-    });
+    this.columnService.addColumn(this.boardLink(), newColumn).subscribe();
+  }
+
+  updateColumn(column: Column, title: string) {
+    column.is_updating = false;
+    if (title == '') {
+      return
+    }
+    column.title = title;
+    this.columnService.updateColumn(this.boardLink(), column).subscribe()
+  }
+
+  removeColumn(column: Column) {
+    this.columnService.deleteColumn(this.boardLink(), column).subscribe()
+  }
+
+  private static remove(array: any[], element: any) {
+    const index: number = array.indexOf(element);
+    if (index !== -1) {
+      array.splice(index, 1);
+    }
   }
 
   newTask(column: Column) {
@@ -60,7 +118,7 @@ export class BoardComponent implements OnInit {
     task.is_updating = false;
     if (title == '') {
       if (task.id == null) {
-        this.removeTaskLocally(column, task)
+        BoardComponent.remove(column.tasks, task)
       }
       return
     }
@@ -75,35 +133,8 @@ export class BoardComponent implements OnInit {
   }
 
   removeTask(task: Task, column: Column) {
-    this.taskService.deleteTask(this.boardLink(), task).subscribe(data => {
-
-      this.removeTaskLocally(column, task);
-    })
-  }
-
-  private removeTaskLocally(column: Column, task: Task) {
-    const index: number = column.tasks.indexOf(task);
-    if (index !== -1) {
-      column.tasks.splice(index, 1);
-    }
-  }
-
-  updateColumn(column: Column, title: string) {
-    column.is_updating = false;
-    if (title == '') {
-      return
-    }
-    column.title = title;
-    this.columnService.updateColumn(this.boardLink(), column).subscribe()
-  }
-
-  removeColumn(column: Column) {
-    this.columnService.deleteColumn(this.boardLink(), column).subscribe(data => {
-
-      const index: number = this.columns.indexOf(column);
-      if (index !== -1) {
-        this.columns.splice(index, 1);
-      }
+    this.taskService.deleteTask(this.boardLink(), task).subscribe(() => {
+      BoardComponent.remove(column.tasks, task)
     })
   }
 
@@ -114,7 +145,7 @@ export class BoardComponent implements OnInit {
     let task = $event.dragData.task;
     task.column_id = column.id;
     this.taskService.updateTask(this.boardLink(), task).subscribe(data => {
-      this.removeTaskLocally($event.dragData.oldColumn, task);
+      BoardComponent.remove($event.dragData.oldColumn.tasks, task);
       column.tasks.push(task);
     });
   }
